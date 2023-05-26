@@ -1,0 +1,57 @@
+<form action="/login" method="POST">
+  <input type="text" name="username" placeholder="Username" required> <br>
+  <input type="password" name="password" placeholder="Password" required> <br>
+  <input type="submit" class="btn" placeholder="Submit">
+</form>
+
+<button onclick="shareLocation()">Share Location</button>
+  <div id="map"></div>
+
+  {{{scripts}}} 
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJpivUV2p5gTQeEKY3kfvXuU9FrZ5ey2k"></script>
+  <script>
+    let map;
+    function shareLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(saveLocation);
+      } else {
+        alert('Geolocation is not supported by this browser.');
+      }
+    }
+
+    function saveLocation(position) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+      const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+      window.open(url);
+
+      const location = { lat:latitude, lng:longitude };
+      map = new google.maps.Map(document.getElementById("map"), {
+      center: location,
+      zoom: 15
+    });
+
+    new google.maps.Marker({
+      position: location,
+      map: map,
+      title: "You are here",
+      animation: google.maps.Animation.BOUNCE
+    });
+      fetch('/location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(location),
+      })
+        .then(res => res.json())
+        .then(data => {
+          console.log('data',data)
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
+
+  </script>
