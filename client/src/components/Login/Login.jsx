@@ -1,11 +1,29 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import axios from "axios";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:3000/login", {
+        username,
+        password,
+      });
+      const data = res.data;
+      console.log(data);
+      navigate("/location");
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
   return (
-    <div className="login-container flex items-center flex-col gap-[50px]">
+    <div className="container flex items-center flex-col gap-[30px]">
       <div className="login-logo mr-[110px]">
-        <p className="Logo mt-[50px] text-primary font-fredoka font-bold text-[32px]">
+        <p className="Logo mt-[50px] text-primary font-bold text-[32px]">
           Logga in
         </p>
         <p className="text-stuckgrey">
@@ -15,16 +33,18 @@ const Login = () => {
           </span>
         </p>
       </div>
-      <form className=" flex flex-col gap-[30px]">
+      <form onSubmit={handleLogin} className=" flex flex-col gap-[30px]">
         <input
+          onChange={(e) => setUsername(e.target.value)}
           className="w-[327px] h-[64px] rounded-[15px] border border-stuckgrey"
           type="text"
           id="username"
           placeholder="E-post eller användarnamn"
         />
         <input
+          onChange={(e) => setPassword(e.target.value)}
           className="w-[327px] h-[64px] rounded-[15px] border border-stuckgrey"
-          type="text"
+          type="password"
           id="password"
           placeholder="Lösenord"
         />
